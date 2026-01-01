@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import dummydata from "./dummydata";
+import axios from "axios";
 
 const Vote = () => {
   const imageArray = ["01", "02", "03", "04"];
+
+  const [questions, setQuestions] = useState<any>();
 
   const [clickedAnswer, setClickedAnswer] = useState<number[]>(() => {
     try {
@@ -13,6 +15,21 @@ const Vote = () => {
       return [];
     }
   });
+
+  useEffect(() => {
+    getAllQuestions();
+  }, []);
+
+  const getAllQuestions = async () => {
+    try {
+      const response = await axios.get("http://localhost:6969/verdict/");
+      setQuestions(response?.data);
+      console.log(questions);
+      return response;
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem("test", JSON.stringify(clickedAnswer));
@@ -42,7 +59,7 @@ const Vote = () => {
           </div>
 
           <div className="row">
-            {dummydata?.data?.map((item: any, index: any) => {
+            {questions?.data?.map((item: any, index: any) => {
               const totalVotes = item.voteCountOne + item.voteCountTwo || 1;
 
               return (
